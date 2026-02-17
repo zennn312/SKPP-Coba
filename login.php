@@ -2,32 +2,36 @@
 session_start();
 include "koneksi.php";
 
+// Kalau sudah login, jangan boleh akses login lagi
+if (isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_POST['login'])) {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
 
-        $result = mysqli_query($conn, "SELECT * FROM user WHERE username = '$username'");
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-        if (mysqli_num_rows($result) === 1) {
-            $row = mysqli_fetch_assoc($result);
-            if (password_verify($password, $row['password'])) {
-                $_SESSION['username'] = $username;
-                header("Location: index.php");
-                echo "<script>
-                        alert('Login Berhasil!');
-                      </script>";
-                exit;
-            }
-            
+    $result = mysqli_query($conn, 
+        "SELECT * FROM user WHERE username = '$username'");
+
+    if (mysqli_num_rows($result) === 1) {
+
+        $row = mysqli_fetch_assoc($result);
+
+        if (password_verify($password, $row['password'])) {
+
+            $_SESSION['username'] = $username;
+            header("Location: index.php");
+            exit;
         }
-            echo "<script>
-                    alert('Username atau password salah!');
-                  </script>";
-        
     }
 
-
+    echo "<script>alert('Username atau password salah!');</script>";
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -42,7 +46,7 @@ if (isset($_POST['login'])) {
 <body>
 
     <?php
-    
+
 
     ?>
     <form action="" method="post">
